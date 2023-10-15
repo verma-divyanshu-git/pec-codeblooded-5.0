@@ -19,7 +19,7 @@ This Employee Data Management and Auditing solution performs basic CRUD Operatio
 
 ## Sample GIF
 
-![Employee Management System](https://raw.githubusercontent.com/Shobhit1338/Employee-Management-System/main/EMS.gif)
+![Employee Data Management and Auditing](https://raw.githubusercontent.com/Shobhit1338/Employee-Management-System/main/EMS.gif)
 
 ## Installation
 
