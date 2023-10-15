@@ -1,14 +1,12 @@
-# Employee Management System
+# Employee Data Management and Auditing
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/bootstrap-%23563D7C.svg?style=for-the-badge&logo=bootstrap&logoColor=white)
-![VS Code Insiders](https://img.shields.io/badge/VS%20Code%20Insiders-35b393.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
 
+This Employee Data Management and Auditing solution performs basic CRUD Operations and provides a powerful and versatile solution for managing, auditing, and querying employee or student data while leveraging the Django framework's capabilities for efficient web application development.
 
-This Employee Management System performs basic CRUD Operations.
-
-## Features 
+## Features
 
 - Add Details such as Name, ID, Phone, Address, Working Status & Department.
 - Uses single form to add details one at a time.
@@ -25,16 +23,10 @@ This Employee Management System performs basic CRUD Operations.
 
 ## Installation
 
-This requires [Python](https://www.python.org/) v3.8+ and [Django](https://www.djangoproject.com/) v4.0.4+ to run.
+This requires [Python](https://www.python.org/) and [Django](https://www.djangoproject.com/) to run.
 
 Install the dependencies and start the server.
 
 ```sh
 python manage.py runserver
 ```
-
-## License
-
-MIT
-
-**Free Software, Hell Yeah!**
