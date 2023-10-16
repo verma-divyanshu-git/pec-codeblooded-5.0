@@ -17,9 +17,12 @@ This Employee Data Management and Auditing solution performs basic CRUD Operatio
 
 > This Application was created using Python, Django, HTML/CSS, and Bootstrap.
 
-## Sample GIF
+## Sample SnapShots
 
-![Employee Data Management and Auditing](https://raw.githubusercontent.com/Shobhit1338/Employee-Management-System/main/EMS.gif)
+![1](1.jpg)
+![2](2.jpg)
+![3](3.jpg)
+![4](4.jpg)
 
 ## Installation
 
