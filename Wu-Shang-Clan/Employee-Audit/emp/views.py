@@ -1,54 +1,21 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
 from .models import Employee, Task, AuditLog, Department, Project, Skill, Office, ProjectAssignment, EmployeeSkill, EmployeeOfficeAssignment, Position
 from django.http import HttpResponse
+from auditlog.models import LogEntry
+from auditlog.registry import auditlog
+from django.contrib.contenttypes.models import ContentType
+from django.urls import path
+from . import views
 
 
 def emp_home(request):
     employees = Employee.objects.all()
-    return render(request, "emp/home.html", {'employees': employees})
+    return render(request, "emp/home.html", {'emps': employees})
 
 
 # def add_employee(request):
-#     if request.method == "POST":
-#         emp_name = request.POST.get("emp_name")
-#         emp_id = request.POST.get("emp_id")
-#         emp_phone = request.POST.get("emp_phone")
-#         emp_address = request.POST.get("emp_address")
-#         emp_working = request.POST.get("emp_working")
-#         emp_department_id = request.POST.get("emp_department")
-#         emp_position_id = request.POST.get("emp_position")
-
-#         # Check if the department ID exists
-#         try:
-#             department = Department.objects.get(id=emp_department_id)
-#         except Department.DoesNotExist:
-#             department = None
-
-#         position = Position.objects.get(
-#             id=emp_position_id) if emp_position_id else None
-
-#         employee = Employee(name=emp_name, emp_id=emp_id, phone=emp_phone, address=emp_address,
-#                             working=emp_working, department=department, position=position)
-#         employee.save()
-
-#         # Log the creation of the employee
-#         log_entry = AuditLog(
-#             action='CREATE',
-#             model='Employee',
-#             object_id=employee.id,
-#             details=f'Employee {employee.name} created.'
-#         )
-#         log_entry.save()
-
-#         return redirect("emp_home")
-
-#     departments = Department.objects.all()
-#     positions = Position.objects.all()
-#     return render(request, "emp/add_employee.html", {'departments': departments, 'positions': positions})
-
-
-def add_employee(request):
     if request.method == "POST":
         emp_name = request.POST.get("emp_name")
         emp_id = request.POST.get("emp_id")
@@ -85,7 +52,7 @@ def add_employee(request):
     return render(request, "emp/add_employee.html", {'departments': departments, 'positions': positions})
 
 
-def delete_employee(request, emp_id):
+# def delete_employee(request, emp_id):
     employee = Employee.objects.get(pk=emp_id)
 
     # Log the deletion of the employee
@@ -99,6 +66,61 @@ def delete_employee(request, emp_id):
 
     employee.delete()
     return redirect("emp_home")
+
+
+def add_employee(request):
+    if request.method == "POST":
+        emp_name = request.POST.get("emp_name")
+        emp_id = request.POST.get("emp_id")
+        emp_phone = request.POST.get("emp_phone")
+        emp_address = request.POST.get("emp_address")
+        emp_working = request.POST.get("emp_working")
+        emp_department_id = request.POST.get("emp_department")
+        emp_position_id = request.POST.get("emp_position")
+
+        emp_working = emp_working.lower() == 'true'
+
+        department = Department.objects.get(
+            id=1)
+        position = Position.objects.get(
+            id=emp_position_id) if emp_position_id else None
+
+        employee = Employee(name=emp_name, emp_id=emp_id, phone=emp_phone, address=emp_address,
+                            working=emp_working, department=department, position=position)
+        employee.save()
+
+        # Log the creation of the employee
+        log_entry = AuditLog(
+            action='CREATE',
+            model='Employee',
+            object_id=employee.id,
+            details=f'Employee {employee.name} created.'
+        )
+        log_entry.save()
+        # employees = Employee.object.all()
+        # return render(request, "emp/home.html", {'employees': employees})
+        # return redirect("emp_home")
+        return redirect("http://127.0.0.1:8000/emp/home/")
+
+    departments = Department.objects.all()
+    positions = Position.objects.all()
+    return render(request, "emp/add_employee.html", {'departments': departments, 'positions': positions})
+
+
+def delete_employee(request, emp_id):
+    employee = Employee.objects.get(pk=emp_id)
+
+    # Log the deletion of the employee
+    log_entry = AuditLog(
+        action='DELETE',
+        model='Employee',
+        object_id=employee.id,
+        details=f'Employee {employee.name} deleted.'
+    )
+    log_entry.save()
+
+    employee.delete()
+    return redirect("http://127.0.0.1:8000/emp/home/")
 
 
 def update_emp(request, emp_id):
@@ -116,7 +138,8 @@ def do_update_emp(request, emp_id):
         emp_phone = request.POST.get("emp_phone")
         emp_address = request.POST.get("emp_address")
         emp_working = request.POST.get("emp_working")
-        emp_department = request.POST.get("emp_department")
+        emp_department_name = request.POST.get(
+            "emp_department")  # Get department name
 
         e = Employee.objects.get(pk=emp_id)
 
@@ -132,11 +155,25 @@ def do_update_emp(request, emp_id):
         e.emp_id = emp_id_temp
         e.phone = emp_phone
         e.address = emp_address
-        e.department = emp_department
+
         if emp_working is None:
             e.working = False
         else:
             e.working = True
+
+        try:
+            # Attempt to get the Department instance by name, and handle the case of multiple results
+            department = Department.objects.get(name=emp_department_name)
+        except Department.MultipleObjectsReturned:
+            # Handle the case where multiple departments have the same name (you can choose the appropriate department)
+            department = Department.objects.filter(
+                name=emp_department_name).first()
+        except Department.DoesNotExist:
+            # Handle the case where no department with that name exists
+            department = None
+
+        e.department = department
+
         e.save()
     return redirect("/emp/home/")
 
@@ -178,7 +215,7 @@ def add_task(request):
         )
         log_entry.save()
 
-        return redirect("task_list")
+        # return redirect("task_list")
 
     employees = Employee.objects.all()
     return render(request, "emp/add_task.html", {'employees': employees})
@@ -197,7 +234,7 @@ def delete_task(request, task_id):
     log_entry.save()
 
     task.delete()
-    return redirect("task_list")
+    # return redirect("task_list")
 
 
 def skill_list(request):
@@ -221,9 +258,9 @@ def add_skill(request):
         )
         log_entry.save()
 
-        return redirect("skill_list")
+        # return redirect("skill_list")
 
-    return render(request, "skill/add_skill.html", {})
+    return render(request, "emp/add_skill.html", {})
 
 
 def delete_skill(request, skill_id):
@@ -244,7 +281,7 @@ def delete_skill(request, skill_id):
 
 def office_list(request):
     offices = Office.objects.all()
-    return render(request, "office/office_list.html", {'offices': offices})
+    return render(request, "emp/office_list.html", {'offices': offices})
 
 
 def add_office(request):
@@ -264,9 +301,9 @@ def add_office(request):
         )
         log_entry.save()
 
-        return redirect("office_list")
+        # return redirect("office_list")
 
-    return render(request, "office/add_office.html", {})
+    return render(request, "emp/add_office.html", {})
 
 
 def delete_office(request, office_id):
@@ -282,12 +319,12 @@ def delete_office(request, office_id):
     log_entry.save()
 
     office.delete()
-    return redirect("office_list")
+    # return redirect("office_list")
 
 
 def project_assignment_list(request):
     project_assignments = ProjectAssignment.objects.all()
-    return render(request, "project_assignment/project_assignment_list.html", {'project_assignments': project_assignments})
+    return render(request, "emp/project_assignment_list.html", {'project_assignments': project_assignments})
 
 
 def add_project_assignment(request):
@@ -311,11 +348,11 @@ def add_project_assignment(request):
         )
         log_entry.save()
 
-        return redirect("project_assignment_list")
+        # return redirect("project_assignment_list")
 
     projects = Project.objects.all()
     employees = Employee.objects.all()
-    return render(request, "project_assignment/add_project_assignment.html", {'projects': projects, 'employees': employees})
+    return render(request, "emp/add_project_assignment.html", {'projects': projects, 'employees': employees})
 
 
 def delete_project_assignment(request, project_assignment_id):
@@ -332,12 +369,12 @@ def delete_project_assignment(request, project_assignment_id):
     log_entry.save()
 
     project_assignment.delete()
-    return redirect("project_assignment_list")
+    # return redirect("project_assignment_list")
 
 
 def employee_skill_list(request):
     employee_skills = EmployeeSkill.objects.all()
-    return render(request, "employee_skill/employee_skill_list.html", {'employee_skills': employee_skills})
+    return render(request, "emp/employee_skill_list.html", {'employee_skills': employee_skills})
 
 
 def add_employee_skill(request):
@@ -360,11 +397,11 @@ def add_employee_skill(request):
         )
         log_entry.save()
 
-        return redirect("employee_skill_list")
+        # return redirect("employee_skill_list")
 
     employees = Employee.objects.all()
     skills = Skill.objects.all()
-    return render(request, "employee_skill/add_employee_skill.html", {'employees': employees, 'skills': skills})
+    return render(request, "emp/add_employee_skill.html", {'employees': employees, 'skills': skills})
 
 
 def delete_employee_skill(request, employee_skill_id):
@@ -380,12 +417,12 @@ def delete_employee_skill(request, employee_skill_id):
     log_entry.save()
 
     employee_skill.delete()
-    return redirect("employee_skill_list")
+    # return redirect("employee_skill_list")
 
 
 def employee_office_assignment_list(request):
     employee_office_assignments = EmployeeOfficeAssignment.objects.all()
-    return render(request, "employee_office_assignment/employee_office_assignment_list.html", {'employee_office_assignments': employee_office_assignments})
+    return render(request, "emp/employee_office_assignment_list.html", {'employee_office_assignments': employee_office_assignments})
 
 
 def add_employee_office_assignment(request):
@@ -409,11 +446,11 @@ def add_employee_office_assignment(request):
         )
         log_entry.save()
 
-        return redirect("employee_office_assignment_list")
+        # return redirect("employee_office_assignment_list")
 
     employees = Employee.objects.all()
     offices = Office.objects.all()
-    return render(request, "employee_office_assignment/add_employee_office_assignment.html", {'employees': employees, 'offices': offices})
+    return render(request, "emp/add_employee_office_assignment.html", {'employees': employees, 'offices': offices})
 
 
 def delete_employee_office_assignment(request, employee_office_assignment_id):
@@ -430,12 +467,12 @@ def delete_employee_office_assignment(request, employee_office_assignment_id):
     log_entry.save()
 
     employee_office_assignment.delete()
-    return redirect("employee_office_assignment_list")
+    # return redirect("employee_office_assignment_list")
 
 
 def position_list(request):
     positions = Position.objects.all()
-    return render(request, "position/position_list.html", {'positions': positions})
+    return render(request, "emp/position_list.html", {'positions': positions})
 
 
 def add_position(request):
@@ -455,9 +492,9 @@ def add_position(request):
         )
         log_entry.save()
 
-        return redirect("position_list")
+        # return redirect("position_list")
 
-    return render(request, "position/add_position.html", {})
+    return render(request, "emp/add_position.html", {})
 
 
 def delete_position(request, position_id):
@@ -473,7 +510,7 @@ def delete_position(request, position_id):
     log_entry.save()
 
     position.delete()
-    return redirect("position_list")
+    # return redirect("position_list")
 
 
 def add_department(request):
@@ -503,3 +540,31 @@ def department_list(request):
     departments = Department.objects.all()
     return render(request, "emp/department_list.html", {'departments': departments})
 
+
+def get_audit_log_changes(model_instance, version_number):
+    # Get the audit log entries for the model instance
+    log_entries = LogEntry.objects.filter(
+        object_id=str(model_instance.id),
+        content_type_id=ContentType.objects.get_for_model(model_instance).id
+    ).order_by('timestamp')
+
+    try:
+        # Retrieve the LogEntry for the desired version
+        log_entry = log_entries[version_number - 1]
+        # Extract and return the changes as a dictionary
+        changes = log_entry.changes_dict
+        return changes
+    except IndexError:
+        return None
+
+
+model_instance = Employee.objects.get(pk=1)  # Get the model instance
+version_number = 3  # The desired version number
+
+changes = get_audit_log_changes(model_instance, version_number)
+if changes:
+    # Access the changes in the form of a dictionary
+    for key, (from_value, to_value) in changes.items():
+        print(f"Field: {key}, From: {from_value}, To: {to_value}")
+else:
+    print("Version not found or does not exist.")

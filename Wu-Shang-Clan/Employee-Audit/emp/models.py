@@ -1,11 +1,13 @@
 from django.db import models
 from auditlog.registry import auditlog
 from auditlog.models import AuditlogHistoryField
+from auditlog.models import LogEntry
 
 
 class Department(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
+    history_dep = AuditlogHistoryField()
 
     def __str__(self):
         return self.name
@@ -14,6 +16,7 @@ class Department(models.Model):
 class Position(models.Model):
     title = models.CharField(max_length=200)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    history_pos = AuditlogHistoryField()
 
     def __str__(self):
         return self.title
@@ -29,6 +32,7 @@ class Employee(models.Model):
         Department, on_delete=models.SET_NULL, null=True)
     position = models.ForeignKey(
         Position, on_delete=models.SET_NULL, null=True)
+    history_employee = AuditlogHistoryField()
 
     def __str__(self):
         return self.name
@@ -40,6 +44,7 @@ class Task(models.Model):
     assigned_to = models.ForeignKey(
         Employee, on_delete=models.CASCADE, related_name='tasks')
     due_date = models.DateField()
+    history_task = AuditlogHistoryField()
 
     def __str__(self):
         return self.title
@@ -58,6 +63,7 @@ class AuditLog(models.Model):
 class Project(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
+    history_proj = AuditlogHistoryField()
 
     def __str__(self):
         return self.name
@@ -66,10 +72,12 @@ class Project(models.Model):
 class ProjectAssignment(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    history_proj_ass = AuditlogHistoryField()
 
 
 class Skill(models.Model):
     name = models.CharField(max_length=100)
+    history_skill = AuditlogHistoryField()
 
     def __str__(self):
         return self.name
@@ -78,11 +86,13 @@ class Skill(models.Model):
 class EmployeeSkill(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
+    history_emp_skill = AuditlogHistoryField()
 
 
 class Office(models.Model):
     name = models.CharField(max_length=200)
     location = models.CharField(max_length=100)
+    history_office = AuditlogHistoryField()
 
     def __str__(self):
         return self.name
@@ -91,6 +101,7 @@ class Office(models.Model):
 class EmployeeOfficeAssignment(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     office = models.ForeignKey(Office, on_delete=models.CASCADE)
+    history_emp_office = AuditlogHistoryField()
 
 
 auditlog.register(Department)
