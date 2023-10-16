@@ -18,7 +18,7 @@
             <div class="col-md-6 offset-md-3">
                 <div class="card bg-dark text-white">
                     <div class "card-body">
-                        <form action="http://127.0.0.1:8000/emp/home/" method="POST">
+                        <form action="{% url 'add_employee_office_assignment' %}" method="POST">
                             {% csrf_token %}
                             <div class="mb-3">
                                 <label for="employee_id">Employee</label>
@@ -39,7 +39,7 @@
                             </div>
 
                             <div class="container text-center">
-                                <button class="btn" style="background-color: #00ABB3;">
+                                <button type="submit" class="btn" style="background-color: #00ABB3;">
                                     Add Employee Office Assignment
                                 </button>
                             </div>
@@ -54,4 +54,5 @@
         integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
         crossorigin="anonymous"></script>
 </body>
+
 </html>

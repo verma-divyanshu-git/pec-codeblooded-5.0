@@ -32,10 +32,11 @@
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ department.name }}</td>
                                     <td>{{ department.description }}</td>
+
                                     <td>
-                                        <a href="/emp/delete-emp/{{ employee.id }}"
+                                        <a href="{% url 'delete_department' department.id %}"
                                             class="btn btn-danger btn-sm">Delete</a>
-                                        <a href="/emp/update-emp/{{ employee.id }}"
+                                        <a href="{% url 'update_department' department.id %}"
                                             class="btn btn-dark btn-sm">Update</a>
                                     </td>
                                 </tr>

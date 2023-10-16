@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Delete Department</title>
+    <!-- Add your CSS styles if needed -->
+</head>
+<body>
+    <h1>Delete Department</h1>
+    <p>Are you sure you want to delete the department "{{ department.name }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="{% url 'department_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</body>
+</html>

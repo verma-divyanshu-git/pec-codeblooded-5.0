@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Audit Log Changes</title>
+</head>
+
+<body>
+    <h1>Audit Log Changes</h1>
+    <ul>
+        {% for entry in audit_log_entries %}
+        <li>
+            <strong>Action:</strong> {{ entry.action }}<br>
+            <strong>Timestamp:</strong> {{ entry.timestamp }}<br>
+            <strong>Details:</strong> {{ entry.details }}<br>
+            <!-- You can display other information here -->
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+
+</html>
