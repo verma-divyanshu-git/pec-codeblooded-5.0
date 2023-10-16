@@ -1,0 +1,12 @@
+<h1>Audit Log History</h1>
+<ul>
+  {% for log_entry in log_entries %}
+  <li>
+    <p>Timestamp: {{ log_entry.timestamp }}</p>
+    <p>User: {{ log_entry.user }}</p>
+    <p>Action: {{ log_entry.get_action_display }}</p>
+    <p>Changes: {{ log_entry.changes }}</p>
+    <hr />
+  </li>
+  {% endfor %}
+</ul>

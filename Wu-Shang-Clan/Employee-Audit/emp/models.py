@@ -57,7 +57,7 @@ class AuditLog(models.Model):
     # The model name (e.g., 'Employee')
     model = models.CharField(max_length=100)
     object_id = models.PositiveIntegerField()  # ID of the affected object
-    details = models.TextField()  # Additional details or changes
+    details = models.TextField()  # Additional details or changesx
 
 
 class Project(models.Model):

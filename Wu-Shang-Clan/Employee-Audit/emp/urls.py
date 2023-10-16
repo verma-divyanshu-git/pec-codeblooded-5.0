@@ -65,5 +65,11 @@ urlpatterns = [
          views.update_employee_office_assignment, name='update_employee_office_assignment'),
     path('add_employee_office_assignment/', views.add_employee_office_assignment,
          name='add_employee_office_assignment'),
-    path('add-position/', add_position)
+    path('add-position/', add_position),
+    #     Rest Framework
+    path('capture_audit_log/<int:object_id>/<int:endpoint>/',
+         CaptureAuditLogView.as_view(), name='capture-audit-log'),
+    #     LogEntry
+    path('display-audit-log/<int:object_id>/',
+         display_audit_log_changes),
 ]

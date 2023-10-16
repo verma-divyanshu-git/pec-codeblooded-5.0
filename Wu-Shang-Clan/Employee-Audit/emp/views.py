@@ -11,7 +11,10 @@ from auditlog.registry import auditlog
 from django.contrib.contenttypes.models import ContentType
 from django.urls import path
 from . import views
-
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .serializers import AuditLogSerializer
+from .models import AuditLog
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
@@ -733,19 +736,29 @@ def capture_audit_log(object_id, endpoint):
     # Get the audit log entries for the specified object, ordered by timestamp
     audit_log_entries = AuditLog.objects.filter(
         object_id=object_id).order_by('timestamp')
-
     # Slice the list to include only the entries up to the desired endpoint
-    captured_entries = audit_log_entries[:endpoint]
+    results = audit_log_entries.values()
+    print(results)
+    captured_entries = results[:endpoint]
 
     return captured_entries
 
 
-def display_audit_log_changes(request, object_id, endpoint):
-    # Call the utility function to capture audit log entries
-    captured_entries = capture_audit_log(object_id, endpoint)
+class CaptureAuditLogView(APIView):
+    def get(self, request, object_id, endpoint):
+        captured_entries = capture_audit_log(object_id, endpoint)
+
+        serializer = AuditLogSerializer(captured_entries, many=True)
+        return Response(serializer.data)
+
+
+def display_audit_log_changes(request, object_id):
+    # Query the historical log entries for the specified object
+    log_entries = LogEntry.objects.filter(
+        object_id=object_id).order_by('timestamp')
 
     context = {
-        'captured_entries': captured_entries,
+        'log_entries': log_entries,
     }
 
-    return render(request, 'emp/display_audit_log_changes.html', context)
+    return render(request, 'emp/log_entries.html', context)

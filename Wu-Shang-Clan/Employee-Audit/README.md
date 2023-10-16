@@ -19,10 +19,10 @@ This Employee Data Management and Auditing solution performs basic CRUD Operatio
 
 ## Sample SnapShots
 
-![1](1.jpg)
-![2](2.jpg)
-![3](3.jpg)
-![4](4.jpg)
+![1](https://github.com/verma-divyanshu-git/pec-codeblooded-5.0/blob/main/Wu-Shang-Clan/Employee-Audit/1.png)
+![2](https://github.com/verma-divyanshu-git/pec-codeblooded-5.0/blob/main/Wu-Shang-Clan/Employee-Audit/2.png)
+![3](https://github.com/verma-divyanshu-git/pec-codeblooded-5.0/blob/main/Wu-Shang-Clan/Employee-Audit/3.png)
+![4](https://github.com/verma-divyanshu-git/pec-codeblooded-5.0/blob/main/Wu-Shang-Clan/Employee-Audit/4.png)
 
 ## Installation
 
